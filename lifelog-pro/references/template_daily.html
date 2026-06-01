@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026-05-28 · LifeLog Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-header:#1a1814;--bg-body:#f7f4ef;--bg-card:#ffffff;
+  --red:#c0392b;--blue:#1d3557;--green:#2d6a4f;--gold:#b8860b;
+  --text:#1a1814;--muted:#6b7280;--border:#e5e0d8;
+  --serif:'Noto Serif SC',serif;--sans:'Noto Sans SC',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg-body);color:var(--text);}
+
+/* ── HEADER ── */
+header{background:var(--bg-header);color:#f7f4ef;padding:28px 40px 0;}
+.h-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.h-date{font-family:var(--mono);font-size:.72rem;color:#6b6560;letter-spacing:.12em;margin-bottom:6px;}
+.h-title{font-family:var(--serif);font-size:1.8rem;font-weight:700;line-height:1.2;}
+.h-summary{color:#a09890;font-size:.85rem;margin-top:6px;max-width:600px;line-height:1.6;}
+.h-sources{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.src-badge{font-family:var(--mono);font-size:.6rem;background:rgba(255,255,255,.07);
+  color:#7a746e;padding:3px 8px;border-radius:2px;letter-spacing:.06em;}
+.src-badge.ok{color:#4ade80;background:rgba(74,222,128,.08);}
+.src-badge.fail{color:#f87171;background:rgba(248,113,113,.08);}
+.h-stats{display:flex;gap:0;border-top:1px solid #252118;margin-top:20px;}
+.hstat{flex:1;padding:14px 0 14px 24px;border-right:1px solid #252118;}
+.hstat:last-child{border-right:none;}
+.hstat-n{font-family:var(--mono);font-size:1.5rem;font-weight:700;color:#f7f4ef;line-height:1;}
+.hstat-l{font-size:.65rem;color:#6b6560;letter-spacing:.08em;margin-top:3px;}
+
+/* ── TABS ── */
+nav.tabs{background:var(--bg-header);position:sticky;top:0;z-index:100;
+  display:flex;padding:0 40px;border-bottom:1px solid #252118;overflow-x:auto;}
+nav.tabs button{background:none;border:none;color:#6b6560;padding:13px 18px;
+  cursor:pointer;font-family:var(--sans);font-size:.82rem;
+  border-bottom:2px solid transparent;white-space:nowrap;transition:all .18s;}
+nav.tabs button.active,nav.tabs button:hover{color:#f7f4ef;border-bottom-color:var(--red);}
+
+/* ── MAIN ── */
+main{max-width:1080px;margin:0 auto;padding:28px 40px;}
+section{display:none;}
+section.active{display:block;}
+
+/* ── CARD ── */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:22px 24px;margin-bottom:18px;}
+.card h2{font-family:var(--serif);font-size:1.05rem;font-weight:700;margin-bottom:14px;
+  padding-bottom:10px;border-bottom:1px solid var(--border);}
+
+/* ── ENERGY CURVE ── */
+.energy-wrap{background:#fafaf8;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:18px;}
+.energy-label{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.1em;margin-bottom:10px;}
+.energy-legend{display:flex;gap:16px;margin-top:8px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--muted);}
+.leg-dot{width:8px;height:8px;border-radius:50%;}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.sg-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
+.sg-n{font-family:var(--mono);font-size:1.6rem;font-weight:700;line-height:1;}
+.sg-l{font-size:.7rem;color:var(--muted);margin-top:4px;}
+.sg-card.dev .sg-n{color:var(--blue);}
+.sg-card.focus .sg-n{color:var(--green);}
+.sg-card.browser .sg-n{color:#f59e0b;}
+.sg-card.agent .sg-n{color:#7c3aed;}
+
+/* ── TIMELINE ── */
+.tl-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.tl-item:last-child{border-bottom:none;}
+.tl-time{font-family:var(--mono);font-size:.72rem;color:var(--muted);min-width:52px;padding-top:2px;}
+.tl-tag{font-size:.58rem;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;}
+.tl-tag.terminal{background:#d1fae5;color:#065f46;}
+.tl-tag.agent   {background:#ede9fe;color:#5b21b6;}
+.tl-tag.browser {background:#dbeafe;color:#1e40af;}
+.tl-tag.app     {background:#fef3c7;color:#92400e;}
+.tl-tag.git     {background:#dbeafe;color:#1e40af;}
+.tl-tag.error   {background:#fee2e2;color:#991b1b;}
+.tl-tag.focus   {background:#d1fae5;color:#065f46;}
+.tl-content{font-size:.82rem;line-height:1.55;color:var(--text);}
+.tl-detail{font-size:.72rem;color:var(--muted);margin-top:2px;}
+
+/* ── GROWTH ── */
+.growth-hero{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
+  border:1.5px solid #7dd3fc;border-radius:10px;padding:22px 24px;margin-bottom:18px;}
+.growth-hero h2{font-family:var(--serif);font-size:1.05rem;margin-bottom:14px;color:var(--blue);}
+.growth-body{font-size:.875rem;line-height:1.85;color:#1e3a5f;}
+.turning-point{background:#fffbeb;border-left:3px solid #f59e0b;
+  padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:.82rem;line-height:1.65;}
+.turning-point strong{color:#92400e;}
+.stall-warn{background:#fff1f2;border-left:3px solid #f43f5e;
+  padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:.82rem;}
+.stall-warn strong{color:#9f1239;}
+.pos-signal{background:#f0fdf4;border-left:3px solid #4ade80;
+  padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:.82rem;}
+.pos-signal strong{color:#166534;}
+
+.three-dim{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:4px;}
+.dim{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.dim h3{font-size:.8rem;font-weight:700;margin-bottom:8px;}
+.dim.psych h3{color:#0369a1;}
+.dim.beh h3{color:#065f46;}
+.dim.skill h3{color:#7c3aed;}
+.dim p{font-size:.78rem;line-height:1.7;color:#4b5563;}
+
+/* ── SKILLS ── */
+.skill-module{background:linear-gradient(135deg,#fff0f3,#fdf2ff);
+  border:1.5px solid #f9a8d4;border-radius:10px;padding:22px 24px;margin-bottom:18px;}
+.skill-module h2{font-family:var(--serif);font-size:1.05rem;margin-bottom:16px;color:#9d174d;}
+.skill-item{background:white;border:1px solid #fce7f3;border-radius:8px;padding:14px 16px;margin-bottom:12px;}
+.skill-item:last-child{margin-bottom:0;}
+.si-lv{display:inline-block;font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:3px;margin-bottom:7px;}
+.si-lv.basic{background:#fee2e2;color:#991b1b;}
+.si-lv.adv{background:#fef3c7;color:#92400e;}
+.si-name{font-size:.875rem;font-weight:700;margin-bottom:5px;}
+.si-desc{font-size:.78rem;line-height:1.65;color:#4b5563;margin-bottom:8px;}
+.si-action{background:#ede9fe;border-radius:5px;padding:8px 12px;font-size:.75rem;color:#5b21b6;line-height:1.6;}
+.si-action code{font-family:var(--mono);background:rgba(91,33,182,.08);padding:1px 5px;border-radius:3px;}
+
+/* ── EXPERTS ── */
+.expert-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.ec{border-radius:10px;padding:20px 22px;}
+.ec.tech   {background:#f0fdf4;border:1.5px solid #4ade80;}
+.ec.biz    {background:#fefce8;border:1.5px solid #fbbf24;}
+.ec.sci    {background:#eff6ff;border:1.5px solid #60a5fa;}
+.ec.health {background:#fdf4ff;border:1.5px solid #d946ef;}
+.ec.synth  {grid-column:1/-1;background:var(--bg-header);color:#f7f4ef;border:2px solid var(--red);}
+.ec-ico{font-size:1.5rem;margin-bottom:8px;}
+.ec-name{font-family:var(--serif);font-size:.95rem;font-weight:700;margin-bottom:2px;}
+.ec.synth .ec-name{color:#f7f4ef;}
+.ec-role{font-size:.68rem;color:var(--muted);margin-bottom:10px;}
+.ec.synth .ec-role{color:#6b6560;}
+.ec-ref{font-size:.65rem;color:#9ca3af;background:rgba(0,0,0,.04);
+  border-radius:3px;padding:3px 8px;margin-bottom:10px;display:inline-block;line-height:1.5;}
+.ec.synth .ec-ref{background:rgba(255,255,255,.06);color:#6b6560;}
+.ec-body{font-size:.82rem;line-height:1.85;color:#374151;}
+.ec.synth .ec-body{color:#c8c0b8;}
+.ec-action{margin-top:12px;padding:9px 12px;background:rgba(0,0,0,.04);border-radius:6px;font-size:.75rem;}
+.ec.synth .ec-action{background:rgba(192,57,43,.15);color:#fca5a5;}
+.ec-action-lbl{font-size:.6rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:2px;}
+.ec.synth .ec-action-lbl{color:#6b6560;}
+
+/* ── TOMORROW ── */
+.tmr-hero{background:var(--bg-header);color:#f7f4ef;border-radius:10px;padding:28px 30px;margin-bottom:20px;text-align:center;}
+.tmr-hero h2{font-family:var(--serif);font-size:1.4rem;margin-bottom:6px;}
+.tmr-hero p{color:#6b6560;font-size:.82rem;margin-bottom:16px;}
+.tmr-action{font-size:.95rem;color:#f9a8d4;line-height:1.8;font-family:var(--serif);}
+.priority-list{list-style:none;}
+.pri-item{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;
+  padding:14px 18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;}
+.pri-n{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--red);min-width:24px;}
+.pri-body{}
+.pri-title{font-size:.875rem;font-weight:700;margin-bottom:3px;}
+.pri-desc{font-size:.78rem;color:var(--muted);line-height:1.6;}
+.pri-meta{font-family:var(--mono);font-size:.65rem;color:var(--red);margin-top:4px;}
+
+footer{text-align:center;padding:20px;color:var(--muted);font-size:.68rem;
+  font-family:var(--mono);border-top:1px solid var(--border);margin-top:32px;}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="h-top">
+    <div>
+      <div class="h-date">THU · 2026-05-28 · LIFELOG PRO v2</div>
+      <div class="h-title">2026-05-28 · 成长日志</div>
+      <div class="h-summary">今天深度推进了 feed-engine 的数据管道，下午专注度出现拐点，晚间借助 Claude Code 完成了卡了两天的 Docker 权限问题。</div>
+      <div class="h-sources" style="margin-top:10px;">
+        <span class="src-badge ok">✓ shell_history</span>
+        <span class="src-badge ok">✓ browser_history</span>
+        <span class="src-badge ok">✓ agent_logs</span>
+        <span class="src-badge ok">✓ app_usage</span>
+        <span class="src-badge ok">✓ second_order</span>
+        <span class="src-badge ok">✓ past_logs (12天)</span>
+        <span class="src-badge fail">✗ playwright</span>
+      </div>
+    </div>
+  </div>
+  <div class="h-stats">
+    <div class="hstat"><div class="hstat-n">247</div><div class="hstat-l">终端命令</div></div>
+    <div class="hstat"><div class="hstat-n">3</div><div class="hstat-l">专注块</div></div>
+    <div class="hstat"><div class="hstat-n">218min</div><div class="hstat-l">深度工作</div></div>
+    <div class="hstat"><div class="hstat-n">87</div><div class="hstat-l">浏览器访问</div></div>
+    <div class="hstat"><div class="hstat-n">2</div><div class="hstat-l">AI Agent会话</div></div>
+    <div class="hstat"><div class="hstat-n">12天</div><div class="hstat-l">历史关联</div></div>
+  </div>
+</header>
+
+<!-- ═══ TABS ═══ -->
+<nav class="tabs">
+  <button class="active" onclick="show('overview',this)">🏠 概览</button>
+  <button onclick="show('timeline',this)">📋 时间线</button>
+  <button onclick="show('growth',this)">📈 成长轨迹</button>
+  <button onclick="show('skills',this)">🎯 技能增强</button>
+  <button onclick="show('experts',this)">🧠 专家委员会</button>
+  <button onclick="show('tomorrow',this)">🚀 明日行动</button>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<main>
+
+<!-- ── TAB: 概览 ── -->
+<section id="overview" class="active">
+
+  <!-- 能量曲线 -->
+  <div class="energy-wrap">
+    <div class="energy-label">TODAY'S ENERGY CURVE · 2026-05-28</div>
+    <svg viewBox="0 0 800 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:130px;">
+      <!-- 背景网格 -->
+      <defs>
+        <pattern id="grid" width="33.3" height="32.5" patternUnits="userSpaceOnUse">
+          <path d="M 33.3 0 L 0 0 0 32.5" fill="none" stroke="#f0ece4" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="800" height="130" fill="#fafaf8"/>
+      <rect width="800" height="130" fill="url(#grid)"/>
+
+      <!-- 专注块底纹 -->
+      <rect x="108" y="10" width="185" height="100" fill="rgba(45,106,79,0.06)" rx="2"/>
+      <text x="115" y="24" font-size="8" fill="#2d6a4f" font-family="monospace" opacity=".7">专注块#1 135min</text>
+      <rect x="510" y="50" width="45" height="60" fill="rgba(45,106,79,0.06)" rx="2"/>
+      <text x="512" y="64" font-size="8" fill="#2d6a4f" font-family="monospace" opacity=".7">#2</text>
+      <rect x="630" y="20" width="68" height="90" fill="rgba(45,106,79,0.06)" rx="2"/>
+      <text x="632" y="34" font-size="8" fill="#2d6a4f" font-family="monospace" opacity=".7">专注块#3 48min</text>
+
+      <!-- 命令密度折线（开发活动：蓝色） -->
+      <polyline
+        points="33,110 66,105 100,40 133,28 166,32 200,35 233,38 266,85 300,105 333,108 366,95 400,100 433,110 466,110 500,108 533,90 566,112 600,112 633,38 666,32 700,55 733,108 766,115"
+        fill="none" stroke="#1d3557" stroke-width="2" stroke-linejoin="round" opacity=".9"/>
+
+      <!-- 浏览器活动（橙色） -->
+      <polyline
+        points="33,115 66,115 100,112 133,115 166,115 200,115 233,115 266,88 300,75 333,85 366,80 400,90 433,72 466,68 500,80 533,95 566,88 600,112 633,115 666,115 700,112 733,115 766,115"
+        fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round" opacity=".7"/>
+
+      <!-- x轴刻度 -->
+      <line x1="33" y1="115" x2="766" y2="115" stroke="#d4cfc8" stroke-width="1"/>
+      <text x="33" y="126" font-size="8" fill="#9ca3af" font-family="monospace" text-anchor="middle">06</text>
+      <text x="133" y="126" font-size="8" fill="#9ca3af" font-family="monospace" text-anchor="middle">09</text>
+      <text x="233" y="126" font-size="8" fill="#9ca3af" font-family="monospace" text-anchor="middle">12</text>
+      <text x="333" y="126" font-size="8" fill="#9ca3af" font-family="monospace" text-anchor="middle">14</text>
+      <text x="433" y="126" font-size="8" fill="#9ca3af" font-family="monospace" text-anchor="middle">16</text>
+      <text x="566" y="126" font-size="8" fill="#9ca3af" font-family="monospace" text-anchor="middle">19</text>
+      <text x="666" y="126" font-size="8" fill="#9ca3af" font-family="monospace" text-anchor="middle">21</text>
+    </svg>
+    <div class="energy-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#1d3557"></div>终端/开发</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div>浏览器</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(45,106,79,.25);width:14px;height:10px;border-radius:2px;"></div>专注块</div>
+    </div>
+  </div>
+
+  <!-- 快速统计 -->
+  <div class="stat-grid">
+    <div class="sg-card dev"><div class="sg-n">247</div><div class="sg-l">终端命令</div></div>
+    <div class="sg-card focus"><div class="sg-n">218<span style="font-size:.8rem">min</span></div><div class="sg-l">深度工作时间</div></div>
+    <div class="sg-card browser"><div class="sg-n">87</div><div class="sg-l">浏览器访问</div></div>
+    <div class="sg-card agent"><div class="sg-n">2</div><div class="sg-l">AI Agent 会话</div></div>
+  </div>
+
+  <!-- AI 概览 -->
+  <div class="card">
+    <h2>今日概览</h2>
+    <p style="font-size:.875rem;line-height:1.85;color:#374151;">
+      今天是一个典型的"前半程高产、后半程挣扎、收尾反弹"的工作日。上午 9 点到 11 点半是今日最高效的专注块（135分钟连续），主要完成了 <code style="font-family:var(--mono);background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:.8rem;">feed-engine</code> 的 FastAPI 路由重构和 SQLite → PostgreSQL 的迁移脚本。下午 2 点之后命令密度明显下降，浏览器切换频率升高，出现了约 40 分钟的低效区间。晚上 8 点重新进入状态，借助 Claude Code 解决了困扰两天的 Docker volume 权限问题，git commit 了今天最重要的一个节点。
+    </p>
+  </div>
+
+  <!-- 浏览器摘要 -->
+  <div class="card">
+    <h2>🌐 浏览器 & 软件摘要</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px;">浏览器分类（87次）</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="height:8px;background:#1d3557;width:39%;border-radius:2px;"></div>
+            <span style="font-size:.75rem;">技术文档 39%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="height:8px;background:#7c3aed;width:21%;border-radius:2px;"></div>
+            <span style="font-size:.75rem;">AI工具 21%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="height:8px;background:#f59e0b;width:16%;border-radius:2px;"></div>
+            <span style="font-size:.75rem;">娱乐/视频 16%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="height:8px;background:#10b981;width:14%;border-radius:2px;"></div>
+            <span style="font-size:.75rem;">搜索引擎 14%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="height:8px;background:#d4cfc8;width:10%;border-radius:2px;"></div>
+            <span style="font-size:.75rem;">其他 10%</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:10px;">重复搜索（知识盲区）</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:#fff1f2;border-radius:5px;padding:7px 10px;font-size:.75rem;">
+            🔴 <code style="font-family:var(--mono);">docker volume permission</code> × 3
+          </div>
+          <div style="background:#fffbeb;border-radius:5px;padding:7px 10px;font-size:.75rem;">
+            🟡 <code style="font-family:var(--mono);">fastapi dependency injection</code> × 2
+          </div>
+          <div style="background:#fffbeb;border-radius:5px;padding:7px 10px;font-size:.75rem;">
+            🟡 <code style="font-family:var(--mono);">asyncpg connection pool</code> × 2
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ── TAB: 时间线 ── -->
+<section id="timeline">
+  <div class="card">
+    <h2>全数据源合并时间线</h2>
+    <div class="tl-item"><div class="tl-time">08:52</div><span class="tl-tag app">APP</span><div class="tl-content">开机，打开 Terminal &amp; VSCode<div class="tl-detail">来源：app_usage</div></div></div>
+    <div class="tl-item"><div class="tl-time">09:03</div><span class="tl-tag terminal">TERMINAL</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">cd ~/projects/feed-engine</code><div class="tl-detail">来源：shell_history</div></div></div>
+    <div class="tl-item"><div class="tl-time">09:05</div><span class="tl-tag git">GIT</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">git pull origin main</code><div class="tl-detail">来源：shell_history · 同步远端</div></div></div>
+    <div class="tl-item"><div class="tl-time">09:08</div><span class="tl-tag terminal">TERMINAL</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">pip install sqlalchemy asyncpg</code><div class="tl-detail">来源：shell_history · 安装 PG 依赖</div></div></div>
+    <div class="tl-item"><div class="tl-time">09:15</div><span class="tl-tag focus">⚡ FOCUS</span><div class="tl-content">专注块 #1 开始<div class="tl-detail">来源：second_order · 预计持续 135 分钟</div></div></div>
+    <div class="tl-item"><div class="tl-time">10:34</div><span class="tl-tag git">GIT</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">git commit -m "refactor: split router into sub-modules"</code><div class="tl-detail">来源：shell_history · ✅ 路由重构完成</div></div></div>
+    <div class="tl-item"><div class="tl-time">11:28</div><span class="tl-tag terminal">TERMINAL</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">python migrate.py --dry-run</code><div class="tl-detail">来源：shell_history · 迁移脚本测试 ✅</div></div></div>
+    <div class="tl-item"><div class="tl-time">11:50</div><span class="tl-tag focus">⚡ FOCUS</span><div class="tl-content">专注块 #1 结束 · 135 分钟<div class="tl-detail">来源：second_order</div></div></div>
+    <div class="tl-item"><div class="tl-time">12:03</div><span class="tl-tag browser">BROWSER</span><div class="tl-content">搜索 "fastapi background tasks queue"<div class="tl-detail">来源：browser_history · google.com</div></div></div>
+    <div class="tl-item"><div class="tl-time">12:18</div><span class="tl-tag browser">BROWSER</span><div class="tl-content">访问 docs.python.org/3/library/asyncio<div class="tl-detail">来源：browser_history · 技术文档</div></div></div>
+    <div class="tl-item"><div class="tl-time">13:45</div><span class="tl-tag agent">AI AGENT</span><div class="tl-content">Claude Code 会话开始 · 任务：异步任务队列优化<div class="tl-detail">来源：agent_logs · 8 轮对话</div></div></div>
+    <div class="tl-item"><div class="tl-time">14:38</div><span class="tl-tag browser">BROWSER</span><div class="tl-content">访问 youtube.com × 3次<div class="tl-detail">来源：browser_history · [娱乐，已标记]</div></div></div>
+    <div class="tl-item"><div class="tl-time">16:05</div><span class="tl-tag error">ERROR</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">docker-compose up --build</code> → Permission denied: /var/lib/data<div class="tl-detail">来源：shell_history · 第 1 次失败</div></div></div>
+    <div class="tl-item"><div class="tl-time">16:08</div><span class="tl-tag browser">BROWSER</span><div class="tl-content">搜索 "docker volume permission denied linux"<div class="tl-detail">来源：browser_history · 🔴 第 3 次搜索此问题</div></div></div>
+    <div class="tl-item"><div class="tl-time">16:22</div><span class="tl-tag error">ERROR</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">docker-compose up --build</code> → 同一错误再次出现<div class="tl-detail">来源：shell_history · 第 2 次失败</div></div></div>
+    <div class="tl-item"><div class="tl-time">19:55</div><span class="tl-tag agent">AI AGENT</span><div class="tl-content">Claude Code 会话开始 · 任务：Docker 权限问题<div class="tl-detail">来源：agent_logs · 5 轮对话</div></div></div>
+    <div class="tl-item"><div class="tl-time">20:18</div><span class="tl-tag focus">⚡ FOCUS</span><div class="tl-content">专注块 #3 开始<div class="tl-detail">来源：second_order</div></div></div>
+    <div class="tl-item"><div class="tl-time">20:31</div><span class="tl-tag git">GIT</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">git commit -m "fix: add USER directive and chown in Dockerfile"</code><div class="tl-detail">来源：shell_history · ✅ Docker 问题解决</div></div></div>
+    <div class="tl-item"><div class="tl-time">21:02</div><span class="tl-tag terminal">TERMINAL</span><div class="tl-content"><code style="font-family:var(--mono);font-size:.78rem;">docker-compose up --build</code> → ✅ 成功<div class="tl-detail">来源：shell_history</div></div></div>
+    <div class="tl-item"><div class="tl-time">21:15</div><span class="tl-tag focus">⚡ FOCUS</span><div class="tl-content">专注块 #3 结束 · 48 分钟<div class="tl-detail">来源：second_order</div></div></div>
+  </div>
+</section>
+
+<!-- ── TAB: 成长轨迹 ── -->
+<section id="growth">
+  <div class="growth-hero">
+    <h2>📈 成长轨迹（关联过去 12 天）</h2>
+    <div class="growth-body">
+      你已连续 <strong>6 天</strong>推进 <code style="font-family:var(--mono);background:rgba(29,53,87,.08);padding:1px 5px;border-radius:3px;">feed-engine</code>，上次停滞超过 7 天是在 5 月 10 日前后——那周你在处理客户需求插队，导致主线项目断了 9 天。这次的连续性明显更健康。
+    </div>
+    <div class="turning-point">
+      <strong>⚠ 拐点警告</strong>：你的专注度从 <strong>5 月 25 日（周一）</strong> 开始出现下滑趋势，今天的专注块总时长（218分钟）比过去 3 天均值（274分钟）低了约 <strong>20%</strong>。周一那天你新开了 <code style="font-family:var(--mono);">side-project-notion-sync</code> 目录并安装了一批依赖，但此后 3 天没有任何相关命令——这个分叉可能正在分散你的注意力。
+    </div>
+    <div class="stall-warn">
+      <strong>🔴 技能短板复现（第 3 次）</strong>：Docker volume 权限问题今天再次出现。历史记录：4 月 20 日、5 月 3 日、今天。建议本周彻底搞清楚 <code style="font-family:var(--mono);">USER</code> 指令和 <code style="font-family:var(--mono);">chown</code> 在 Dockerfile 里的正确写法，而不是每次靠搜索解决。
+    </div>
+    <div class="pos-signal">
+      <strong>✅ 正向信号</strong>：你在 FastAPI 上的操作越来越熟练，今天没有出现上周那种反复查文档的情况，路由重构的命令序列非常干净。FastAPI 这个节点正在从"需要查阅"升级为"肌肉记忆"。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🧠 三维分析</h2>
+    <div class="three-dim">
+      <div class="dim psych">
+        <h3>🧠 心理状态</h3>
+        <p>今天呈现"启动顺畅→下午内耗→晚间回血"模式。上午心流明显，下午注意力耗尽后选择了逃避性浏览而非主动休息，Docker 连续失败加剧了挫败感。晚间恢复能力不错，但整体认知资源消耗偏高。</p>
+      </div>
+      <div class="dim beh">
+        <h3>⚡ 行为模式</h3>
+        <p>工作时长约 7.5h，深度工作 218min。娱乐占比 18%（高于近 7 天均值 12%），分心指数 6.2/10。下午时段工具切换频率是上午的 2.7 倍，是今日效率最低的区间。</p>
+      </div>
+      <div class="dim skill">
+        <h3>🎯 技能成长</h3>
+        <p>今日新接触 asyncpg 和 Dockerfile USER 指令。FastAPI 操作进入肌肉记忆阶段（✅）。Docker 权限是持续短板（第 3 次）。asyncio 理解不稳固，需专项解决。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TAB: 技能增强 ── -->
+<section id="skills">
+  <div class="skill-module">
+    <h2>🎯 技能增强雷达</h2>
+
+    <div class="skill-item">
+      <div class="si-lv basic">🔴 基础能力不足</div>
+      <div class="si-name">Docker 用户权限 &amp; Volume 挂载</div>
+      <div class="si-desc">第 3 次遇到同一问题（4/20, 5/3, 今天）。根本原因：不理解 Dockerfile 中 <code style="font-family:var(--mono);">USER</code> 指令的执行时机和 volume mount 的权限继承机制，每次靠搜索临时解决但没有真正理解。</div>
+      <div class="si-action">
+        <strong>立即解决：</strong><br>
+        <code>RUN mkdir -p /var/lib/data && chown -R appuser:appuser /var/lib/data</code><br>
+        <code>USER appuser  # 必须在 COPY/RUN 之后，CMD 之前</code><br><br>
+        今晚花 20 分钟读：docs.docker.com/engine/reference/builder/#user
+      </div>
+    </div>
+
+    <div class="skill-item">
+      <div class="si-lv adv">🟡 进阶能力短板</div>
+      <div class="si-name">asyncio 并发模型理解</div>
+      <div class="si-desc">今日两次搜索 asyncio 相关问题，Claude Code 帮你写了方案但你对 <code style="font-family:var(--mono);">asyncio.gather</code> vs <code style="font-family:var(--mono);">asyncio.create_task</code> 的区别理解不稳固，无法独立判断使用场景。</div>
+      <div class="si-action">
+        <strong>学习方向：</strong><br>
+        1. 官方文档 asyncio 高层 API（重点：Task 和 Future 的区别）<br>
+        2. 实践：把今天 Claude Code 写的任务队列代码自己手写一遍并加注释
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── TAB: 专家委员会 ── -->
+<section id="experts">
+  <div class="expert-grid">
+
+    <div class="ec tech">
+      <div class="ec-ico">🔬</div>
+      <div class="ec-name">科技领域专家</div>
+      <div class="ec-role">顶级 LLM · 硅谷工程师 · AI研究员视角</div>
+      <div class="ec-ref">📰 引用：Anthropic 发布 Claude 4 强化 agentic coding · Docker BuildKit 文档更新</div>
+      <div class="ec-body">
+        你今天推进的技术栈（FastAPI + PostgreSQL + Docker + AI-assisted coding）是当前工程落地的主流组合，方向没有问题。但有一个值得注意的信号：你今天两次依赖 Claude Code 解决了本可通过文档解决的基础问题。AI 加速你的执行是好事，但如果基础理解没有跟上，你会越来越依赖 AI 来"打补丁"，而不是真正掌握这些工具。今日你在 FastAPI 路由上的操作已经不需要 AI 辅助了——Docker 应该在下周达到同样的水平。
+      </div>
+      <div class="ec-action">
+        <div class="ec-action-lbl">→ 今日行动</div>
+        读 Dockerfile USER 指令官方文档，用自己的话写 3 条笔记，预计 20 分钟。
+      </div>
+    </div>
+
+    <div class="ec biz">
+      <div class="ec-ico">💰</div>
+      <div class="ec-name">商业 / 投资专家</div>
+      <div class="ec-role">顶级 LLM · 一线投资人 · 产业分析师视角</div>
+      <div class="ec-ref">📰 引用：纳斯达克今日涨 1.8% · AI基础设施板块领涨 · Redis 新一轮融资</div>
+      <div class="ec-body">
+        你在做的 feed-engine 涉及数据管道 + AI 集成，在今日 AI 基础设施板块领涨的背景下，这个方向的市场窗口正在打开，但窗口不会无限等待。你目前最大的商业风险不是技术，而是 side-project-notion-sync 这类分叉：你今天创建了它的目录，但没有做任何实质工作——这类"启动了但没有推进"的项目是精力的黑洞，会持续消耗你的背景认知负担。
+      </div>
+      <div class="ec-action">
+        <div class="ec-action-lbl">→ 今日行动</div>
+        打开 side-project-notion-sync 目录，5 分钟内二选一：写下下一步行动，或 <code style="font-family:var(--mono);">rm -rf</code>。不允许搁置。
+      </div>
+    </div>
+
+    <div class="ec sci">
+      <div class="ec-ico">🧬</div>
+      <div class="ec-name">学术 / 科学专家</div>
+      <div class="ec-role">顶级 LLM · 跨学科研究者 · 知识图谱视角</div>
+      <div class="ec-ref">📰 引用：MIT CSAIL《Efficient Async I/O Patterns in Python 3.12》本周发布</div>
+      <div class="ec-body">
+        你今天在 asyncio 上遇到的困惑，触及了 Python 并发模型里一个真正复杂的理论问题：event loop 的调度策略和 I/O bound vs CPU bound 任务的本质区别。你现在用的方法能跑通，但你不理解它为什么能跑通——这在生产环境里是隐患。你的知识图谱里"Python 异步"这个节点现在是孤立的，需要和"操作系统 I/O 模型"连接起来才会稳固。MIT 那篇论文第 3 节专门讲 asyncpg 连接池最佳实践。
+      </div>
+      <div class="ec-action">
+        <div class="ec-action-lbl">→ 今日行动</div>
+        搜索"asyncio event loop internals python"，读 30 分钟，在 queue.py 里写解释性注释。
+      </div>
+    </div>
+
+    <div class="ec health">
+      <div class="ec-ico">🧠</div>
+      <div class="ec-name">心理 / 健康专家</div>
+      <div class="ec-role">顶级 LLM · 认知科学家 · 功能医学医生视角</div>
+      <div class="ec-ref">📰 引用：Nature子刊：认知负荷峰值后不休息，错误率上升 40%</div>
+      <div class="ec-body">
+        你下午 2 点之后的低效不是懒惰，是大脑的正常耗尽信号（能量曲线密度跌至 0.18）。但你的应对是刷视频而不是真正休息——刷视频不能恢复认知资源，神经系统仍在消耗状态。这就是为什么你 4 点多再次遇到 Docker 问题时直接重复了同样的错误命令两次。今晚已经是认知资源的尾声，22:00 之后写的代码大概率明天需要修。
+      </div>
+      <div class="ec-action">
+        <div class="ec-action-lbl">→ 今日行动</div>
+        22:00 前关电脑，做 10 分钟拉伸（颈部 + 手腕），明天上午 9 点前不看手机。
+      </div>
+    </div>
+
+    <div class="ec synth">
+      <div class="ec-ico">🌐</div>
+      <div class="ec-name">综合专家（压轴）</div>
+      <div class="ec-role">整合四位专家 · 全量数据 · 全量新闻的超级视角</div>
+      <div class="ec-ref">综合以上所有信号 · 2026-05-28</div>
+      <div class="ec-body">
+        今天的核心信号是：<strong style="color:#f7f4ef;">你有能力产出，但在用错误的方式管理精力</strong>。上午的 135 分钟专注块证明你能进入心流，但下午的崩塌和晚上的硬撑说明你还没有建立"主动休息"的工作节奏。Docker 问题第 3 次出现不是技术问题，是系统性问题——你在用 AI 和搜索引擎替代真正的理解，这个模式如果持续，会在下一个你不熟悉的领域以更大的代价出现。market timing 是好的（AI 基础设施窗口在打开），但你当前的执行节奏无法支撑那个窗口。side-project-notion-sync 是今晚必须解决的决策，不是明天。
+      </div>
+      <div class="ec-action">
+        <div class="ec-action-lbl">🚀 明日第一行动</div>
+        明天 <strong>09:00</strong>，打开 feed-engine，先花 <strong>15 分钟</strong>给 queue.py 的关键函数写解释性注释（解释为什么这么写），然后再开始新功能。目标：下次遇到类似 asyncio 问题时，不需要搜索，不需要问 Claude。预计 15 分钟，可验证：queue.py 每个关键函数上方有 2 行以上注释。
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── TAB: 明日行动 ── -->
+<section id="tomorrow">
+  <div class="tmr-hero">
+    <h2>🚀 明日行动计划</h2>
+    <p>基于今日数据 + 专家委员会建议 · 2026-05-29</p>
+    <div class="tmr-action">
+      明天 09:00，打开 feed-engine，先花 15 分钟给 queue.py 写注释，<br>
+      再开始新功能——这是综合专家给出的第一优先级。
+    </div>
+  </div>
+
+  <ul class="priority-list">
+    <li class="pri-item">
+      <div class="pri-n">01</div>
+      <div class="pri-body">
+        <div class="pri-title">queue.py 注释补完（15min）</div>
+        <div class="pri-desc">给 asyncio 任务队列的关键函数写解释性注释，解释 gather vs create_task 的选择原因。目标：下次不需要搜索或问 Claude。</div>
+        <div class="pri-meta">09:00 → 09:15 · feed-engine · 可验证：每个函数 ≥2 行注释</div>
+      </div>
+    </li>
+    <li class="pri-item">
+      <div class="pri-n">02</div>
+      <div class="pri-body">
+        <div class="pri-title">Docker USER 指令文档（20min）</div>
+        <div class="pri-desc">彻底搞清楚 Dockerfile 中 USER 指令和 volume 权限继承机制，写 3 条笔记到 daily_notes.md，结束第 3 次重复踩坑的循环。</div>
+        <div class="pri-meta">09:15 → 09:35 · 科技专家建议 · 可验证：笔记写入完成</div>
+      </div>
+    </li>
+    <li class="pri-item">
+      <div class="pri-n">03</div>
+      <div class="pri-body">
+        <div class="pri-title">side-project-notion-sync 决策（5min）</div>
+        <div class="pri-desc">继续（写下下一步行动）或放弃（rm -rf 目录）。不允许再次搁置，这个未决策正在持续消耗你的背景认知负担。</div>
+        <div class="pri-meta">今晚睡前 · 商业专家建议 · 二选一，无第三选项</div>
+      </div>
+    </li>
+    <li class="pri-item">
+      <div class="pri-n">04</div>
+      <div class="pri-body">
+        <div class="pri-title">asyncio 压力测试</div>
+        <div class="pri-desc">Claude Code 写的异步任务队列版本还未做压力测试，在上生产之前需要验证并发下的连接池行为。</div>
+        <div class="pri-meta">下午时段 · feed-engine · 可验证：跑通 100 并发压测</div>
+      </div>
+    </li>
+    <li class="pri-item">
+      <div class="pri-n">05</div>
+      <div class="pri-body">
+        <div class="pri-title">下午 15:00 强制休息 20min</div>
+        <div class="pri-desc">根据今日能量曲线，你的认知低谷在下午 2-4 点。明天在这个时间段主动休息（不是刷视频），测试是否能改善晚间效率。</div>
+        <div class="pri-meta">15:00 · 健康专家建议 · 离开屏幕，散步或闭目</div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+</main>
+
+<footer>ALL DATA LOCAL · PRIVACY FIRST · NEVER UPLOADED · LIFELOG PRO v2 · 2026-05-28</footer>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>

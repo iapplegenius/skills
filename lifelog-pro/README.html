@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeLog Pro · 超级成长日志系统</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0d0a;
+  --paper: #f5f1ea;
+  --cream: #ede8df;
+  --red: #c0392b;
+  --red-light: #e8453a;
+  --blue: #1d3557;
+  --green: #2d6a4f;
+  --gold: #b8860b;
+  --mono: 'JetBrains Mono', monospace;
+  --serif: 'Noto Serif SC', serif;
+  --sans: 'Noto Sans SC', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ─── HERO ─── */
+.hero {
+  background: var(--ink);
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(192,57,43,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(29,53,87,0.2) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 60px;
+  position: relative;
+  z-index: 2;
+}
+.logo {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: #a09890;
+  letter-spacing: 0.15em;
+}
+.logo span { color: var(--red); }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a {
+  color: #6b6560;
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: #f5f1ea; }
+
+.hero-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 60px;
+  position: relative;
+  z-index: 2;
+}
+.hero-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--red);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-label::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--red);
+}
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 900;
+  color: #f5f1ea;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.hero-title .accent { color: var(--red); }
+.hero-title .version {
+  font-family: var(--mono);
+  font-size: 0.25em;
+  color: #6b6560;
+  vertical-align: super;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+.hero-sub {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  color: #7a746e;
+  font-weight: 300;
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+  margin-top: 8px;
+}
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  background: var(--red);
+  color: #f5f1ea;
+  border: none;
+  padding: 14px 32px;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--red-light); }
+.btn-ghost {
+  color: #6b6560;
+  font-size: 0.8rem;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+}
+.btn-ghost:hover { color: #f5f1ea; }
+
+.hero-stats {
+  display: flex;
+  gap: 0;
+  padding: 0 60px 48px;
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid #1e1c18;
+  padding-top: 32px;
+  margin-top: 32px;
+}
+.hstat {
+  flex: 1;
+  padding: 0 32px 0 0;
+  border-right: 1px solid #1e1c18;
+  margin-right: 32px;
+}
+.hstat:last-child { border-right: none; margin-right: 0; }
+.hstat-num {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f5f1ea;
+  display: block;
+}
+.hstat-label {
+  font-size: 0.72rem;
+  color: #6b6560;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+/* ─── SECTION BASE ─── */
+section { padding: 100px 60px; }
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--red);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--red);
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.section-desc {
+  color: #5a5550;
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 560px;
+}
+
+/* ─── FEATURES GRID ─── */
+.features { background: var(--paper); }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 64px;
+  background: #d4cfc8;
+}
+.feat-card {
+  background: var(--paper);
+  padding: 36px 32px;
+  position: relative;
+  transition: background 0.2s;
+}
+.feat-card:hover { background: var(--cream); }
+.feat-icon {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  display: block;
+}
+.feat-title {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+.feat-desc {
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: #6b6560;
+}
+.feat-tag {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  background: rgba(192,57,43,0.08);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+/* ─── HOW IT WORKS ─── */
+.how { background: var(--ink); color: #f5f1ea; }
+.how .section-title { color: #f5f1ea; }
+.how .section-desc { color: #7a746e; }
+.phases {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-top: 64px;
+  background: #1e1c18;
+}
+.phase-card {
+  background: #141210;
+  padding: 32px 28px;
+  position: relative;
+  transition: background 0.2s;
+}
+.phase-card:hover { background: #1a1814; }
+.phase-num {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: #3a3830;
+  letter-spacing: 0.15em;
+  margin-bottom: 20px;
+}
+.phase-title {
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e5e0d8;
+  margin-bottom: 10px;
+}
+.phase-desc {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #6b6560;
+}
+.phase-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.phase-bar.p0 { background: #3a3830; }
+.phase-bar.p1 { background: var(--red); }
+.phase-bar.p2 { background: var(--blue); }
+.phase-bar.p3 { background: var(--green); }
+.phase-bar.p4 { background: var(--gold); }
+.phase-bar.p5 { background: #7c3aed; }
+.phase-bar.p6 { background: #0891b2; }
+
+/* ─── EXPERT COMMITTEE ─── */
+.experts { background: #f0ece4; }
+.expert-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 64px;
+}
+.expert-card {
+  padding: 28px 30px;
+  border-radius: 4px;
+  position: relative;
+}
+.expert-card.tech     { background: #f0fdf4; border-left: 3px solid #4ade80; }
+.expert-card.biz      { background: #fefce8; border-left: 3px solid #fbbf24; }
+.expert-card.sci      { background: #eff6ff; border-left: 3px solid #60a5fa; }
+.expert-card.health   { background: #fdf4ff; border-left: 3px solid #d946ef; }
+.expert-card.synth    {
+  grid-column: 1 / -1;
+  background: var(--ink);
+  color: #f5f1ea;
+  border-left: 3px solid var(--red);
+}
+.ec-icon { font-size: 1.5rem; margin-bottom: 10px; }
+.ec-name {
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.expert-card.synth .ec-name { color: #f5f1ea; }
+.ec-role {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+}
+.ec-desc {
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: #4b5563;
+}
+.expert-card.synth .ec-desc { color: #a09890; }
+.ec-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--red);
+  letter-spacing: 0.08em;
+  background: rgba(192,57,43,0.08);
+  padding: 4px 10px;
+  border-radius: 2px;
+}
+
+/* ─── REPORT MODES ─── */
+.modes { background: var(--paper); }
+.modes-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 64px;
+  background: #d4cfc8;
+}
+.mode-card {
+  background: var(--paper);
+  padding: 40px 36px;
+}
+.mode-num {
+  font-family: var(--mono);
+  font-size: 3rem;
+  font-weight: 700;
+  color: #d4cfc8;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+.mode-title {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.mode-trigger {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--red);
+  background: rgba(192,57,43,0.07);
+  padding: 6px 12px;
+  border-radius: 3px;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+.mode-desc {
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: #6b6560;
+}
+.mode-features { margin-top: 16px; list-style: none; }
+.mode-features li {
+  font-size: 0.8rem;
+  color: #5a5550;
+  padding: 5px 0;
+  border-bottom: 1px solid #e8e3db;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mode-features li::before {
+  content: '→';
+  color: var(--red);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+}
+
+/* ─── USAGE / QUICKSTART ─── */
+.usage { background: var(--ink); color: #f5f1ea; }
+.usage .section-title { color: #f5f1ea; }
+.usage .section-desc { color: #7a746e; }
+.steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 64px;
+  align-items: start;
+}
+.step-list { display: flex; flex-direction: column; gap: 0; }
+.step {
+  display: flex;
+  gap: 20px;
+  padding: 24px 0;
+  border-bottom: 1px solid #1e1c18;
+  position: relative;
+}
+.step:last-child { border-bottom: none; }
+.step-n {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: #3a3830;
+  min-width: 36px;
+  padding-top: 3px;
+}
+.step-content {}
+.step-title {
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e5e0d8;
+  margin-bottom: 6px;
+}
+.step-desc {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #6b6560;
+}
+.code-panel {
+  background: #0a0906;
+  border: 1px solid #1e1c18;
+  border-radius: 4px;
+  overflow: hidden;
+  position: sticky;
+  top: 20px;
+}
+.code-header {
+  background: #141210;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1e1c18;
+}
+.code-dots { display: flex; gap: 6px; }
+.code-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.code-dots .d1 { background: #ff5f57; }
+.code-dots .d2 { background: #febc2e; }
+.code-dots .d3 { background: #28c840; }
+.code-filename {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: #6b6560;
+  letter-spacing: 0.05em;
+}
+.code-body {
+  padding: 24px 20px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.9;
+  color: #a09890;
+  white-space: pre;
+  overflow-x: auto;
+}
+.code-body .c  { color: #3a3830; }
+.code-body .kw { color: var(--red); }
+.code-body .str{ color: #4ade80; }
+.code-body .fn { color: #60a5fa; }
+.code-body .hl { color: #fbbf24; }
+
+/* ─── OUTPUT ─── */
+.output { background: var(--cream); }
+.output-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 64px;
+}
+.out-card {
+  background: white;
+  padding: 32px;
+  border: 1px solid #d4cfc8;
+}
+.out-icon { font-size: 2rem; margin-bottom: 16px; }
+.out-title {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.out-filename {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--red);
+  background: rgba(192,57,43,0.07);
+  padding: 4px 10px;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+.out-desc {
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: #6b6560;
+}
+.out-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+.out-tab {
+  font-size: 0.72rem;
+  background: var(--cream);
+  color: #5a5550;
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-family: var(--mono);
+}
+
+/* ─── PLATFORM ─── */
+.platform { background: var(--ink); }
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 64px;
+  background: #1e1c18;
+}
+.plat-card {
+  background: #0f0d0a;
+  padding: 32px;
+  text-align: center;
+  transition: background 0.2s;
+}
+.plat-card:hover { background: #141210; }
+.plat-icon { font-size: 2.5rem; margin-bottom: 16px; }
+.plat-name {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e5e0d8;
+  margin-bottom: 8px;
+}
+.plat-shells {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: #6b6560;
+  line-height: 1.8;
+}
+
+/* ─── PRIVACY ─── */
+.privacy {
+  background: var(--red);
+  color: #f5f1ea;
+  padding: 80px 60px;
+  text-align: center;
+}
+.privacy h2 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.privacy p {
+  font-size: 1rem;
+  opacity: 0.8;
+  max-width: 560px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+.privacy-badges {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+.priv-badge {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  background: rgba(0,0,0,0.15);
+  padding: 8px 18px;
+  border-radius: 2px;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--ink);
+  padding: 40px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #1e1c18;
+}
+.footer-logo {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: #3a3830;
+  letter-spacing: 0.15em;
+}
+.footer-logo span { color: var(--red); }
+.footer-note {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: #3a3830;
+  letter-spacing: 0.05em;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  section { padding: 60px 24px; }
+  .hero-nav, .hero-body, .hero-stats { padding-left: 24px; padding-right: 24px; }
+  .features-grid, .phases, .modes-row, .platform-grid { grid-template-columns: 1fr; }
+  .expert-grid, .steps, .output-grid { grid-template-columns: 1fr; }
+  .expert-card.synth { grid-column: auto; }
+  .hero-stats { flex-direction: column; gap: 16px; }
+  .hstat { border-right: none; border-bottom: 1px solid #1e1c18; padding-bottom: 16px; margin-right: 0; }
+  .hstat:last-child { border-bottom: none; }
+  footer { flex-direction: column; gap: 12px; text-align: center; }
+}
+
+/* scroll reveal */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s, transform 0.6s; }
+.reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <nav class="hero-nav">
+    <div class="logo">LIFE<span>LOG</span> · PRO</div>
+    <div class="nav-links">
+      <a href="#features">功能</a>
+      <a href="#how">运行原理</a>
+      <a href="#usage">使用方法</a>
+      <a href="#experts">专家委员会</a>
+    </div>
+  </nav>
+
+  <div class="hero-body">
+    <div class="hero-label">CLAUDE SKILL · v2.0</div>
+    <h1 class="hero-title">
+      LifeLog<span class="accent">.</span>Pro<span class="version">v2</span>
+    </h1>
+    <p class="hero-sub">
+      不只是日记——是你每天的镜子。<br>
+      自动采集行为数据，联动实时新闻，由专家委员会告诉你<br>
+      今天在世界里意味着什么，明天第一件事做什么。
+    </p>
+    <div class="hero-cta">
+      <a href="#usage" class="btn-primary">立即开始使用</a>
+      <a href="#how" class="btn-ghost">了解运行原理 →</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hstat">
+      <span class="hstat-num">8</span>
+      <div class="hstat-label">AUTO DATA SOURCES</div>
+    </div>
+    <div class="hstat">
+      <span class="hstat-num">5</span>
+      <div class="hstat-label">EXPERT PERSPECTIVES</div>
+    </div>
+    <div class="hstat">
+      <span class="hstat-num">3</span>
+      <div class="hstat-label">REPORT MODES</div>
+    </div>
+    <div class="hstat">
+      <span class="hstat-num">Win·Mac·Linux</span>
+      <div class="hstat-label">PLATFORM SUPPORT</div>
+    </div>
+    <div class="hstat">
+      <span class="hstat-num">100%</span>
+      <div class="hstat-label">LOCAL · NEVER UPLOADED</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">核心能力</div>
+  <h2 class="section-title reveal">把每一天变成<br>可分析的数据</h2>
+  <p class="section-desc reveal">LifeLog Pro 不需要你手动记录任何东西。它自动读取你今天在电脑上做的一切，然后帮你看见自己。</p>
+
+  <div class="features-grid">
+    <div class="feat-card reveal">
+      <span class="feat-tag">AUTO</span>
+      <span class="feat-icon">🤖</span>
+      <div class="feat-title">全自动数据采集</div>
+      <div class="feat-desc">运行一个 Python 脚本，自动读取 Shell history、浏览器历史、AI agent 对话记录、软件使用情况、今日编辑文件。不需要粘贴，不需要手动输入。</div>
+    </div>
+    <div class="feat-card reveal">
+      <span class="feat-tag">INSIGHT</span>
+      <span class="feat-icon">⚡</span>
+      <div class="feat-title">能量曲线可视化</div>
+      <div class="feat-desc">从命令时间戳提取二阶信号：每小时工作密度、专注块数量、高峰/低谷时段、分心指数。用一条 SVG 曲线看清你今天的真实状态。</div>
+    </div>
+    <div class="feat-card reveal">
+      <span class="feat-tag">MEMORY</span>
+      <span class="feat-icon">📖</span>
+      <div class="feat-title">历史关联 + 拐点分析</div>
+      <div class="feat-desc">自动扫描过去 30 天的日报，识别项目停滞、技能短板复现、专注度拐点。不只是"你最近在努力"，而是"你的专注度在周三崩了，那天发生了什么"。</div>
+    </div>
+    <div class="feat-card reveal">
+      <span class="feat-tag">LIVE</span>
+      <span class="feat-icon">🌐</span>
+      <div class="feat-title">实时新闻 × 专家委员会</div>
+      <div class="feat-desc">每次生成日报，自动抓取今日科技、财经、科学、健康新闻，交给五位领域专家结合你的数据给出动态建议——不是固定模板，是今天的世界 + 今天的你。</div>
+    </div>
+    <div class="feat-card reveal">
+      <span class="feat-tag">ACTION</span>
+      <span class="feat-icon">🚀</span>
+      <div class="feat-title">明日行动闭环</div>
+      <div class="feat-desc">综合专家给出的不是鼓励，是一个格式化的行动指令："明天 9 点，做 X，预计 30 分钟，目标：可验证的结果 Y。" 日记从回顾变成驱动。</div>
+    </div>
+    <div class="feat-card reveal">
+      <span class="feat-tag">GROWTH</span>
+      <span class="feat-icon">📅</span>
+      <div class="feat-title">日报 / 周报 / 月报</div>
+      <div class="feat-desc">说"生成周报"，自动聚合过去 7 天日报，输出 7 天能量曲线叠加图、项目时间矩阵、技能短板周追踪，以及周度版专家委员会建议。</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-label">运行原理</div>
+  <h2 class="section-title reveal">六个阶段<br>从数据到洞见</h2>
+  <p class="section-desc reveal">每次触发 LifeLog Pro，自动按序执行以下流程。</p>
+
+  <div class="phases">
+    <div class="phase-card reveal">
+      <div class="phase-bar p0"></div>
+      <div class="phase-num">PHASE 00</div>
+      <div class="phase-title">判断报告模式</div>
+      <div class="phase-desc">根据触发词自动判断：日报（今天）、周报（本周）、月报（本月），进入对应的处理流程。</div>
+    </div>
+    <div class="phase-card reveal">
+      <div class="phase-bar p1"></div>
+      <div class="phase-num">PHASE 01</div>
+      <div class="phase-title">自动采集数据</div>
+      <div class="phase-desc">运行 collect.py，从本机读取 Shell history、浏览器历史、agent 对话、软件使用。失败的数据源自动跳过。</div>
+    </div>
+    <div class="phase-card reveal">
+      <div class="phase-bar p2"></div>
+      <div class="phase-num">PHASE 02</div>
+      <div class="phase-title">解析 + 二阶信号</div>
+      <div class="phase-desc">分类命令、提取项目名、识别错误重试，同时计算命令时间间隔，构建能量曲线和专注块数据。</div>
+    </div>
+    <div class="phase-card reveal">
+      <div class="phase-bar p3"></div>
+      <div class="phase-num">PHASE 03</div>
+      <div class="phase-title">历史关联 + 拐点</div>
+      <div class="phase-desc">扫描过去 30 天日报，运行拐点识别算法，找出专注度变化节点、项目停滞警告、技能短板复现。</div>
+    </div>
+    <div class="phase-card reveal">
+      <div class="phase-bar p4"></div>
+      <div class="phase-num">PHASE 04</div>
+      <div class="phase-title">实时新闻抓取</div>
+      <div class="phase-desc">Web Search 抓取今日科技/财经/科学/健康新闻，提取标题、摘要、来源，作为专家委员会的信息基础。</div>
+    </div>
+    <div class="phase-card reveal">
+      <div class="phase-bar p5"></div>
+      <div class="phase-num">PHASE 05</div>
+      <div class="phase-title">专家委员会建议</div>
+      <div class="phase-desc">五位专家各自综合用户数据 + 新闻，输出具体建议。综合专家压轴，给出明日第一行动。</div>
+    </div>
+    <div class="phase-card reveal">
+      <div class="phase-bar p6"></div>
+      <div class="phase-num">PHASE 06</div>
+      <div class="phase-title">生成 MD + HTML</div>
+      <div class="phase-desc">输出 daily_YYYY-MM-DD.md 和 .html 双文件。HTML 包含六个 Tab，含能量曲线 SVG 和专家卡片。</div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERT COMMITTEE -->
+<section class="experts" id="experts">
+  <div class="section-label">专家委员会</div>
+  <h2 class="section-title reveal">今天的世界 ×<br>今天的你</h2>
+  <p class="section-desc reveal">不是固定人物，不是模板话语。每次生成，五位专家都基于今日真实新闻 + 你当天的具体行为说话。</p>
+
+  <div class="expert-grid">
+    <div class="expert-card tech reveal">
+      <div class="ec-icon">🔬</div>
+      <div class="ec-name">科技领域专家</div>
+      <div class="ec-role">顶级 LLM · 硅谷工程师 · AI研究员视角</div>
+      <div class="ec-desc">今日 AI/科技新闻 × 你的开发行为。告诉你当前用的技术在行业格局里处于什么位置，给出一个具体的技术升级或方向调整建议。</div>
+      <div class="ec-badge">强制引用：今日科技新闻 + 你的命令记录</div>
+    </div>
+
+    <div class="expert-card biz reveal">
+      <div class="ec-icon">💰</div>
+      <div class="ec-name">商业 / 投资专家</div>
+      <div class="ec-role">顶级 LLM · 一线投资人 · 产业分析师视角</div>
+      <div class="ec-desc">今日财经/纳斯达克新闻 × 你的技能市场价值。判断你当前方向的商业时间窗口，指出一个职业方向的具体建议和真实风险。</div>
+      <div class="ec-badge">强制引用：今日财经新闻 + 你的项目数据</div>
+    </div>
+
+    <div class="expert-card sci reveal">
+      <div class="ec-icon">🧬</div>
+      <div class="ec-name">学术 / 科学专家</div>
+      <div class="ec-role">顶级 LLM · 跨学科研究者 · 知识图谱视角</div>
+      <div class="ec-desc">本周科研突破 × 你的知识盲区（从浏览器重复搜索识别）。找出一个与你工作高度相关但你可能不知道的研究发现，给出具体的知识升级路径。</div>
+      <div class="ec-badge">强制引用：本周科学新闻 + 你的搜索记录</div>
+    </div>
+
+    <div class="expert-card health reveal">
+      <div class="ec-icon">🧠</div>
+      <div class="ec-name">心理 / 健康专家</div>
+      <div class="ec-role">顶级 LLM · 认知科学家 · 功能医学医生视角</div>
+      <div class="ec-desc">你的能量曲线 + 分心指数 × 健康行为新闻。解读今日高峰/低谷，推断心理状态，给出今晚就能做的 1-2 个具体行动。</div>
+      <div class="ec-badge">强制引用：你的能量曲线数据 + 健康新闻</div>
+    </div>
+
+    <div class="expert-card synth reveal">
+      <div class="ec-icon">🌐</div>
+      <div class="ec-name">综合专家（压轴）</div>
+      <div class="ec-role">整合四位专家 · 全量数据 · 全量新闻的超级视角</div>
+      <div class="ec-desc">串联四个视角的最关键信号，指出今天最重要的一个发现（可能是反直觉的），最终给出格式化的明日第一行动："明天 [时间]，做 [具体事]，预计 [时长]，目标：[可验证结果]"。</div>
+      <div class="ec-badge">明日第一行动 · 格式化 · 可验证</div>
+    </div>
+  </div>
+</section>
+
+<!-- REPORT MODES -->
+<section class="modes">
+  <div class="section-label">报告模式</div>
+  <h2 class="section-title reveal">日 / 周 / 月<br>三种粒度</h2>
+
+  <div class="modes-row">
+    <div class="mode-card reveal">
+      <div class="mode-num">01</div>
+      <div class="mode-title">日报</div>
+      <div class="mode-trigger">生成日记 / 记录今天 / lifelog</div>
+      <div class="mode-desc">处理当天的所有数据，生成完整的六 Tab HTML 日报。</div>
+      <ul class="mode-features">
+        <li>能量曲线 SVG 可视化</li>
+        <li>全数据源合并时间线</li>
+        <li>专家委员会（今日新闻版）</li>
+        <li>技能增强雷达</li>
+        <li>明日行动 Tab</li>
+      </ul>
+    </div>
+    <div class="mode-card reveal">
+      <div class="mode-num">02</div>
+      <div class="mode-title">周报</div>
+      <div class="mode-trigger">生成周报 / 本周总结 / weekly</div>
+      <div class="mode-desc">自动聚合过去 7 天日报，生成周维度的成长分析。</div>
+      <ul class="mode-features">
+        <li>7 天能量曲线叠加图</li>
+        <li>项目时间矩阵（每天×每项目）</li>
+        <li>技能短板周追踪</li>
+        <li>最高效 vs 最低效天对比</li>
+        <li>专家委员会·周度版</li>
+      </ul>
+    </div>
+    <div class="mode-card reveal">
+      <div class="mode-num">03</div>
+      <div class="mode-title">月报</div>
+      <div class="mode-trigger">生成月报 / 本月总结 / monthly</div>
+      <div class="mode-desc">聚合过去 30 天日报，提供月维度的成长全景图。</div>
+      <ul class="mode-features">
+        <li>30 天专注度趋势图</li>
+        <li>月度技能成长矩阵</li>
+        <li>项目全貌（完成/停滞/新增）</li>
+        <li>行为习惯月度分析</li>
+        <li>专家委员会·月度版</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- USAGE -->
+<section class="usage" id="usage">
+  <div class="section-label">使用方法</div>
+  <h2 class="section-title reveal">三步开始<br>零配置</h2>
+  <p class="section-desc reveal">LifeLog Pro 不需要注册账号，不需要 API Key，不需要配置文件。直接对 Claude 说话即可。</p>
+
+  <div class="steps">
+    <div class="step-list reveal">
+
+      <div class="step">
+        <div class="step-n">STEP 01</div>
+        <div class="step-content">
+          <div class="step-title">安装 skill（一次性）</div>
+          <div class="step-desc">将 lifelog-pro.skill 文件上传到你的 Claude skill 目录，或由管理员安装。安装后无需其他配置。</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">STEP 02</div>
+        <div class="step-content">
+          <div class="step-title">对 Claude 说任意触发词</div>
+          <div class="step-desc">在 Claude Code、claude.ai 或任何集成了 Claude 的环境中，直接说"生成今天的日记"或"lifelog-pro"，skill 自动激活。</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">STEP 03</div>
+        <div class="step-content">
+          <div class="step-title">等待生成，下载文件</div>
+          <div class="step-desc">Claude 自动采集数据、抓取新闻、生成日报，最终输出 .md + .html 两个文件供下载。整个过程约 1-3 分钟。</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">可选</div>
+        <div class="step-content">
+          <div class="step-title">手动补充内容</div>
+          <div class="step-desc">若自动采集遗漏了某些内容，可以额外粘贴 history 文本或上传截图，Claude 会自动合并处理。</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">可选</div>
+        <div class="step-content">
+          <div class="step-title">指定日志存储路径</div>
+          <div class="step-desc">将每天生成的 daily_*.md 文件存放在固定目录（如 ~/lifelog/），skill 会自动扫描并用于历史关联分析。目录越完整，分析越精准。</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="code-panel reveal">
+      <div class="code-header">
+        <div class="code-dots">
+          <span class="d1"></span><span class="d2"></span><span class="d3"></span>
+        </div>
+        <div class="code-filename">触发词参考</div>
+      </div>
+      <div class="code-body"><span class="c"># ─── 日报 ───────────────────</span>
+<span class="hl">"生成今天的日记"</span>
+<span class="hl">"帮我整理一下今天"</span>
+<span class="hl">"lifelog"</span>
+<span class="hl">"lifelog-pro"</span>
+<span class="hl">"记录今天"</span>
+<span class="hl">"分析我今天"</span>
+
+<span class="c"># ─── 周报 ───────────────────</span>
+<span class="hl">"生成周报"</span>
+<span class="hl">"本周总结"</span>
+<span class="hl">"weekly report"</span>
+<span class="hl">"这周回顾一下"</span>
+
+<span class="c"># ─── 月报 ───────────────────</span>
+<span class="hl">"生成月报"</span>
+<span class="hl">"本月总结"</span>
+
+<span class="c"># ─── 带附加说明 ─────────────</span>
+<span class="hl">"lifelog，不要读取历史日记"</span>
+<span class="hl">"生成日报，重点分析今天的专注度"</span>
+<span class="hl">"lifelog-pro"</span> <span class="c">+ 粘贴 history 文本</span>
+<span class="hl">"lifelog"</span> <span class="c">+ 上传今日截图</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTPUT FILES -->
+<section class="output">
+  <div class="section-label">输出文件</div>
+  <h2 class="section-title reveal">双格式输出<br>本地留存</h2>
+
+  <div class="output-grid">
+    <div class="out-card reveal">
+      <div class="out-icon">📄</div>
+      <div class="out-title">Markdown 日报</div>
+      <div class="out-filename">daily_YYYY-MM-DD.md</div>
+      <div class="out-desc">带 YAML frontmatter 的结构化 Markdown，兼容 Obsidian、Notion、Logseq 等知识库工具。包含完整时间线、命令统计、技能分析、专家建议全文。</div>
+      <div class="out-tabs">
+        <span class="out-tab">Obsidian兼容</span>
+        <span class="out-tab">YAML frontmatter</span>
+        <span class="out-tab">知识节点标签</span>
+      </div>
+    </div>
+
+    <div class="out-card reveal">
+      <div class="out-icon">🌐</div>
+      <div class="out-title">HTML 交互日报</div>
+      <div class="out-filename">daily_YYYY-MM-DD.html</div>
+      <div class="out-desc">单文件 HTML，包含六个交互 Tab，能量曲线 SVG，五张专家卡片，明日行动聚焦页。打开即用，无需网络，无需服务器。</div>
+      <div class="out-tabs">
+        <span class="out-tab">🏠 概览</span>
+        <span class="out-tab">📋 时间线</span>
+        <span class="out-tab">📈 成长轨迹</span>
+        <span class="out-tab">🎯 技能增强</span>
+        <span class="out-tab">🧠 专家委员会</span>
+        <span class="out-tab">🚀 明日行动</span>
+      </div>
+    </div>
+
+    <div class="out-card reveal">
+      <div class="out-icon">📅</div>
+      <div class="out-title">Markdown 周报</div>
+      <div class="out-filename">weekly_YYYY-WNN.md</div>
+      <div class="out-desc">聚合 7 天数据的周报，包含项目时间矩阵、技能短板周追踪、行为模式分析，以及周度版专家委员会建议。</div>
+      <div class="out-tabs">
+        <span class="out-tab">ISO 周编号</span>
+        <span class="out-tab">7天聚合</span>
+      </div>
+    </div>
+
+    <div class="out-card reveal">
+      <div class="out-icon">📊</div>
+      <div class="out-title">HTML 周报</div>
+      <div class="out-filename">weekly_YYYY-WNN.html</div>
+      <div class="out-desc">7 天能量曲线叠加可视化图表，项目 × 日期矩阵热图，最高效/最低效天高亮对比，周度专家委员会卡片。</div>
+      <div class="out-tabs">
+        <span class="out-tab">7天叠加图</span>
+        <span class="out-tab">项目矩阵</span>
+        <span class="out-tab">周度专家版</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORM -->
+<section class="platform">
+  <div class="section-label">跨平台支持</div>
+  <h2 class="section-title reveal" style="color:#e5e0d8">三大操作系统<br>一个 Skill</h2>
+
+  <div class="platform-grid">
+    <div class="plat-card reveal">
+      <div class="plat-icon">🍎</div>
+      <div class="plat-name">macOS</div>
+      <div class="plat-shells">
+        Shell: zsh · bash · fish<br>
+        浏览器: Chrome · Firefox · Safari · Edge<br>
+        进程采集: ps + lsappinfo<br>
+        文件搜索: mdfind（Spotlight）<br>
+        Agent: Claude Code · Cursor · Codex
+      </div>
+    </div>
+    <div class="plat-card reveal">
+      <div class="plat-icon">🐧</div>
+      <div class="plat-name">Linux</div>
+      <div class="plat-shells">
+        Shell: bash · zsh · fish<br>
+        浏览器: Chrome · Chromium · Firefox · Edge<br>
+        进程采集: ps + wmctrl<br>
+        文件搜索: find<br>
+        Agent: Claude Code · Cursor · Codex · Hermes
+      </div>
+    </div>
+    <div class="plat-card reveal">
+      <div class="plat-icon">🪟</div>
+      <div class="plat-name">Windows</div>
+      <div class="plat-shells">
+        Shell: PowerShell · CMD<br>
+        浏览器: Chrome · Edge · Firefox<br>
+        进程采集: Get-Process（PowerShell）<br>
+        文件搜索: Get-ChildItem<br>
+        Agent: Claude Code · Cursor · Codex
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<div class="privacy">
+  <h2>你的数据，只在你的机器上</h2>
+  <p>LifeLog Pro 的所有采集、分析、存储全部在本地完成。没有云同步，没有数据上传，没有任何外部服务接触你的私人数据。唯一的网络请求是：Claude 用 Web Search 抓取公开新闻。</p>
+  <div class="privacy-badges">
+    <span class="priv-badge">ALL DATA LOCAL</span>
+    <span class="priv-badge">NEVER UPLOADED</span>
+    <span class="priv-badge">NO ACCOUNT REQUIRED</span>
+    <span class="priv-badge">SENSITIVE CONTENT AUTO-FILTERED</span>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">LIFE<span>LOG</span> · PRO · v2.0</div>
+  <div class="footer-note">CLAUDE SKILL · BUILT WITH ♥ · LOCAL FIRST</div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
