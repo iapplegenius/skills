@@ -313,3 +313,216 @@ Y轴：不显示数字，仅做参考线
 ```
 
 能量对比图：7条折线叠加，每天一个颜色，图例标注日期。
+
+---
+
+## 概览页（#overview）完整结构规范
+
+概览页必须包含以下四个区块，**按顺序**输出：
+
+### 区块1：活动分类卡片（`.overview-grid`）
+
+```html
+<div class="overview-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">
+  <!-- 终端活动卡片 -->
+  <div class="ov-card" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:18px">
+    <div style="font-size:1.5rem;margin-bottom:6px">💻</div>
+    <div style="font-size:.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:.05em">终端活动</div>
+    <div style="font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:#166534;margin:4px 0">{{CMD_COUNT}}</div>
+    <div style="font-size:.8rem;color:#374151">条命令 · {{CMD_PROJECTS}} 个项目</div>
+    <div style="font-size:.75rem;color:#6b7280;margin-top:8px">主要：{{CMD_TOP_CATEGORY}}</div>
+  </div>
+
+  <!-- AI Agent 卡片 -->
+  <div class="ov-card" style="background:#fdf4ff;border:1.5px solid #d8b4fe;border-radius:12px;padding:18px">
+    <div style="font-size:1.5rem;margin-bottom:6px">🤖</div>
+    <div style="font-size:.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:.05em">AI Agent</div>
+    <div style="font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:#7c3aed;margin:4px 0">{{AGENT_SESSIONS}}</div>
+    <div style="font-size:.8rem;color:#374151">次会话 · {{AGENT_TOOLS}}</div>
+    <div style="font-size:.75rem;color:#6b7280;margin-top:8px">主任务：{{AGENT_MAIN_TASK}}</div>
+  </div>
+
+  <!-- 浏览器活动卡片 -->
+  <div class="ov-card" style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:12px;padding:18px">
+    <div style="font-size:1.5rem;margin-bottom:6px">🌐</div>
+    <div style="font-size:.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:.05em">浏览器</div>
+    <div style="font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:#1d4ed8;margin:4px 0">{{BROWSER_VISITS}}</div>
+    <div style="font-size:.8rem;color:#374151">次访问 · 技术 {{TECH_RATIO}}%</div>
+    <div style="font-size:.75rem;color:#6b7280;margin-top:8px">娱乐：{{ENT_RATIO}}%</div>
+  </div>
+
+  <!-- 专注度卡片 -->
+  <div class="ov-card" style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:18px">
+    <div style="font-size:1.5rem;margin-bottom:6px">⚡</div>
+    <div style="font-size:.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:.05em">深度专注</div>
+    <div style="font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:#d97706;margin:4px 0">{{FOCUS_BLOCKS}}</div>
+    <div style="font-size:.8rem;color:#374151">个专注块 · 共 {{FOCUS_MINUTES}} 分钟</div>
+    <div style="font-size:.75rem;color:#6b7280;margin-top:8px">高峰：{{PEAK_HOURS}}</div>
+  </div>
+</div>
+```
+
+### 区块2：时间分布 SVG 图表
+
+```html
+<div class="energy-wrap">
+  <h3 style="font-size:.85rem;font-weight:700;margin-bottom:12px;color:var(--text-secondary)">TODAY'S ENERGY CURVE</h3>
+  <svg class="energy-chart" viewBox="0 0 800 160" xmlns="http://www.w3.org/2000/svg">
+    {{ENERGY_CURVE_SVG}}
+  </svg>
+  <!-- 图例 -->
+  <div style="display:flex;gap:16px;margin-top:8px;font-size:.72rem;color:var(--text-secondary)">
+    <span><span style="display:inline-block;width:10px;height:3px;background:#1d3557;border-radius:2px;vertical-align:middle;margin-right:4px"></span>终端</span>
+    <span><span style="display:inline-block;width:10px;height:3px;background:#f59e0b;border-radius:2px;vertical-align:middle;margin-right:4px"></span>浏览器</span>
+    <span><span style="display:inline-block;width:10px;height:3px;background:#7c3aed;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Agent</span>
+    <span><span style="display:inline-block;width:10px;height:3px;background:#d1d5db;border-radius:2px;vertical-align:middle;margin-right:4px"></span>空闲</span>
+  </div>
+</div>
+```
+
+### 区块3：AI 摘要卡片
+
+```html
+<div class="card">
+  <h2>今日概览</h2>
+  <p style="line-height:1.8;color:#374151">{{AI_NARRATIVE}}</p>
+</div>
+```
+
+### 区块4：开发摘要卡片（可选，有开发数据时显示）
+
+```html
+<div class="card">
+  <h2>开发 / 工作摘要</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div style="font-size:.75rem;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase">涉及项目</div>
+      {{PROJECT_TAGS_HTML}}
+    </div>
+    <div>
+      <div style="font-size:.75rem;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase">命令分类</div>
+      {{CMD_CATEGORY_BARS_HTML}}
+    </div>
+  </div>
+</div>
+```
+
+---
+
+## 洞察&技能页（#insights）完整结构规范
+
+洞察&技能页（Tab 名称：🎯 洞察&技能）必须包含以下三个区块：
+
+### 区块1：技能增强雷达
+
+```html
+<div class="skill-module">
+  <h2 style="font-family:var(--font-serif);font-size:1.15rem;margin-bottom:16px">🎯 技能增强雷达</h2>
+  <p style="font-size:.8rem;color:var(--text-secondary);margin-bottom:16px">基于今日操作日志自动识别的技能短板与提升机会</p>
+  {{SKILL_ITEMS_HTML}}
+  <!-- 无短板时 -->
+  <!-- <div style="text-align:center;padding:24px;color:var(--text-secondary)">今日操作未发现明显短板 🎉</div> -->
+</div>
+```
+
+### 区块2：命令统计表
+
+```html
+<div class="card">
+  <h2>命令分类统计</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:.875rem">
+    <thead>
+      <tr style="background:#f9fafb">
+        <th style="text-align:left;padding:10px 12px;border-bottom:2px solid var(--border)">类别</th>
+        <th style="text-align:right;padding:10px 12px;border-bottom:2px solid var(--border)">数量</th>
+        <th style="text-align:right;padding:10px 12px;border-bottom:2px solid var(--border)">占比</th>
+        <th style="padding:10px 12px;border-bottom:2px solid var(--border)">分布</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{CMD_STAT_ROWS_HTML}}
+      <!-- 每行格式示例：
+      <tr>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border)">开发</td>
+        <td style="text-align:right;padding:9px 12px;border-bottom:1px solid var(--border);font-family:var(--font-mono)">42</td>
+        <td style="text-align:right;padding:9px 12px;border-bottom:1px solid var(--border);font-family:var(--font-mono)">58%</td>
+        <td style="padding:9px 12px;border-bottom:1px solid var(--border)">
+          <div style="height:6px;background:#1d3557;border-radius:3px;width:58%"></div>
+        </td>
+      </tr>
+      -->
+    </tbody>
+  </table>
+</div>
+```
+
+### 区块3：Obsidian 知识节点标签云
+
+```html
+<div class="card">
+  <h2>🔮 Obsidian 知识节点</h2>
+  <p style="font-size:.8rem;color:var(--text-secondary);margin-bottom:14px">可复制到 Obsidian 使用的双链标签</p>
+  <!-- 话题标签 -->
+  <div style="margin-bottom:12px">
+    <div style="font-size:.72rem;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">今日标签</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      {{OBSIDIAN_HASHTAGS_HTML}}
+      <!-- 每个标签：
+      <span style="background:#e0f2fe;color:#0369a1;padding:4px 12px;border-radius:20px;
+                   font-size:.8rem;font-family:var(--font-mono);cursor:pointer"
+            onclick="navigator.clipboard.writeText(this.textContent)">#技能名</span>
+      -->
+    </div>
+  </div>
+  <!-- 双链节点 -->
+  <div>
+    <div style="font-size:.72rem;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">知识双链</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      {{OBSIDIAN_WIKILINKS_HTML}}
+      <!-- 每个双链：
+      <span style="background:#f0fdf4;color:#166534;padding:4px 12px;border-radius:20px;
+                   font-size:.8rem;border:1px solid #86efac;cursor:pointer"
+            onclick="navigator.clipboard.writeText(this.textContent)">[[概念名]]</span>
+      -->
+    </div>
+  </div>
+  <!-- 一键复制全部 -->
+  <div style="margin-top:16px">
+    <button onclick="copyObsidian()"
+            style="background:var(--bg-header);color:#f7f4ef;border:none;padding:8px 16px;
+                   border-radius:6px;cursor:pointer;font-size:.8rem;font-family:var(--font-sans)">
+      📋 复制全部到 Obsidian
+    </button>
+  </div>
+</div>
+
+<script>
+function copyObsidian() {
+  const tags = [...document.querySelectorAll('#insights .card:last-child span')]
+    .map(s => s.textContent).join(' ');
+  navigator.clipboard.writeText(tags).then(() => {
+    const btn = document.querySelector('#insights button');
+    btn.textContent = '✅ 已复制'; setTimeout(() => btn.textContent = '📋 复制全部到 Obsidian', 2000);
+  });
+}
+</script>
+```
+
+---
+
+## Tab 导航按钮对应关系（必须严格匹配）
+
+```html
+<nav class="tabs">
+  <button class="active" onclick="showTab('overview',this)">🏠 概览</button>
+  <button onclick="showTab('timeline',this)">📋 时间线</button>
+  <button onclick="showTab('insights',this)">🎯 洞察&技能</button>
+  <button onclick="showTab('growth',this)">📈 成长轨迹</button>
+  <button onclick="showTab('experts',this)">🧠 专家委员会</button>
+  <button onclick="showTab('tomorrow',this)">🚀 明日行动</button>
+</nav>
+```
+
+对应 section id：`overview` / `timeline` / `insights` / `growth` / `experts` / `tomorrow`
+
+> 注意：原模板 Tab 顺序已更新，将"洞察&技能"移至时间线后、成长轨迹前，与 lifelog-daily 对齐。
